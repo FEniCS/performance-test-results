@@ -1,0 +1,26 @@
+<head>
+<!-- Load plotly.js into the DOM -->
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+</head>
+
+<body>
+
+  <H1> Performance Test Listing </H1>
+
+<script>
+
+function replot()
+{
+    fetch('https://api.github.com/repos/FEniCS/performance-test-results/contents/results')
+	.then((response) => {
+	    return response.json();
+	})
+	.then((myJson) => {
+	    console.log(myJson);
+	});
+}
+
+window.onload = replot;
+
+</script>
+</body>
