@@ -17,6 +17,24 @@
 
 <script>
 
+var saved_dir;
+
+function page_boot()
+{
+    // Get directory listing
+    fetch('https://api.github.com/repos/FEniCS/performance-test-results/contents/results')
+	.then((response) => {
+	    return response.json();
+	})
+	.then((jsonDirectory) => {
+	    console.log(jsonDirectory);
+	    saved_dir = jsonDirectory;
+	    console.log(saved_dir);
+	    replot();
+	});
+
+}
+
 function replot()
 {
     var metric_selector = document.getElementById("metric");
@@ -38,7 +56,10 @@ function replot()
     var traces = {Poisson:[],
 		  Elastic:[]};
 
-    fetch('https://raw.githubusercontent.com/wiki/FEniCS/performance-test/results.json')
+    var filename = saved_dir[0]['name'];
+    console.log(filename);
+
+    fetch('https://raw.githubusercontent.com/FEniCS/performance-test-results/master/results/' + filename)
 	.then((response) => {
 	    return response.json();
 	})
@@ -77,9 +98,8 @@ function replot()
 }
 
 var metric_selector = document.getElementById("metric");
-window.onload = replot;
+window.onload = page_boot;
 metric_selector.onchange = replot;
-
 
 </script>
 </body>

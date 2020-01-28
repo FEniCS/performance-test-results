@@ -7,20 +7,37 @@
 
   <H1> Performance Test Listing </H1>
 
+  <button id="list"> list </button>
+
 <script>
 
-function replot()
+var saved_dir;
+
+function list_directory()
 {
+    // Get directory listing
     fetch('https://api.github.com/repos/FEniCS/performance-test-results/contents/results')
 	.then((response) => {
 	    return response.json();
 	})
-	.then((myJson) => {
-	    console.log(myJson);
+	.then((jsonDirectory) => {
+	    console.log(jsonDirectory);
+	    saved_dir = jsonDirectory;
 	});
+
+    document.getElementById("list").onclick = listing;
 }
 
-window.onload = replot;
+function listing()
+{
+    for (var key in saved_dir){
+	var record = saved_dir[key];
+	console.log(record['name']);
+    }
+}
+
+window.onload = list_directory;
+
 
 </script>
 </body>
