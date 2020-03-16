@@ -82,38 +82,52 @@ function replot()
     var traces = {Poisson:[],
 		  Elastic:[]};
 
-	for (i=0; i<performance_data.length; i++)
-	{
-		var record = performance_data[i];
-		console.log(record.time);
-		console.log(record.data);
+	// var result = Object.values(record.data).filter(function(x){return x.nodes==1})
+	// console.log(result)
 
-		var p = {'Poisson': [], 'Elastic': []};
-		for (var r in record.data)
-		{
-			w = record.data[r];
-			p[w.problem].push([w.nodes, w[metric]]);
-		}
-		for (var k in p)
-		{
-			p[k] = p[k].sort(function(a, b){
-				return a[0] - b[0];
-			});
+	// var result = performance_data.map(x => [x.time, x.data.filter(function(x){return x.nodes==1 && x.problem=="Poisson"})[0][metric]])
+	// console.log(result)
+	
+	var trace = {x: [],
+				 y: [],
+				 name: record.time}};
+	
+	trace.x = performance_data.map(x => x.time)
+	trace.y = performance_data.map(x => x.data.filter(function(x){return x.nodes==1 && x.problem=="Poisson"})[0][metric])
 
-			var trace = {x: [],
-					y: [],
-					type: 'bar',
-					name: record.time};
+	// for (i=0; i<performance_data.length; i++)
+	// {
+	// 	var record = performance_data[i];
+	// 	console.log(record.time);
+	// 	console.log(record.data);
 
-			for (var a in p[k])
-			{
-				trace.x.push(String(p[k][a][0])+"x");
-				trace.y.push(p[k][a][1]);
-			}
-			traces[k].push(trace);
-		}
-	}
-    Plotly.newPlot('PoissonDiv', traces.Poisson, layout_p);
+	// 	var p = {'Poisson': [], 'Elastic': []};
+	// 	for (var r in record.data)
+	// 	{
+	// 		w = record.data[r];
+	// 		p[w.problem].push([w.nodes, w[metric]]);
+	// 	}
+	// 	for (var k in p)
+	// 	{
+	// 		p[k] = p[k].sort(function(a, b){
+	// 			return a[0] - b[0];
+	// 		});
+
+	// 		var trace = {x: [],
+	// 				y: [],
+	// 				type: 'bar',
+	// 				name: record.time};
+
+	// 		for (var a in p[k])
+	// 		{
+	// 			trace.x.push(String(p[k][a][0])+"x");
+	// 			trace.y.push(p[k][a][1]);
+	// 		}
+	// 		traces[k].push(trace);
+	// 	}
+	// }
+	console.log([trace])
+    Plotly.newPlot('PoissonDiv', [trace], layout_p);
     Plotly.newPlot('ElasticDiv', traces.Elastic, layout_e);
 
 }
