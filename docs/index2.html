@@ -73,34 +73,34 @@ function replot()
 
     for (var i in performance_data){
 	perf_data = performance_data[i];
-	for (var key in perf_data){
-	    var record = perf_data[key];
-	    console.log(record.data);
-	    console.log(record.time);
+		for (var key in perf_data){
+			var record = perf_data[key];
+			console.log(record.data);
+			console.log(record.time);
 
-	    var p = {'Poisson': [], 'Elastic': []};
-	    for (var r in record.data){
-		w = record.data[r];
-		p[w.problem].push([w.nodes, w[metric]]);
-	    }
-	    for (var k in p){
+			var p = {'Poisson': [], 'Elastic': []};
+			for (var r in record.data){
+				w = record.data[r];
+				p[w.problem].push([w.nodes, w[metric]]);
+			}
+			for (var k in p){
 
-		p[k] = p[k].sort(function(a, b){
-		    return a[0] - b[0];
-		});
+				p[k] = p[k].sort(function(a, b){
+					return a[0] - b[0];
+				});
 
-		var trace = {x: [],
-			     y: [],
-			     type: 'bar',
-			     name: record.time};
+				var trace = {x: [],
+						y: [],
+						type: 'bar',
+						name: record.time};
 
-		for (var a in p[k]){
-		    trace.x.push(String(p[k][a][0])+"x");
-		    trace.y.push(p[k][a][1]);
+				for (var a in p[k]){
+					trace.x.push(String(p[k][a][0])+"x");
+					trace.y.push(p[k][a][1]);
+				}
+				traces[k].push(trace);
+			}
 		}
-		traces[k].push(trace);
-	    }
-	}
     }
     Plotly.newPlot('PoissonDiv', traces.Poisson, layout_p);
     Plotly.newPlot('ElasticDiv', traces.Elastic, layout_e);
