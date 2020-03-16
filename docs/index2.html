@@ -108,7 +108,7 @@ function replot()
 }
 
 var metric_selector = document.getElementById("metric");
-window.onload = page_boot;
+window.onload = page_boot; // Any reason for not just calling page_boot?
 metric_selector.onchange = replot;
 
 </script>
