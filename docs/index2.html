@@ -42,6 +42,7 @@ function fetch_data(filename)
 				performance_data.push(temp_data[i][j])
 			}
 		}
+		performance_data = performance_data.sort((a, b) => b.time - a.time)
 	});
 }
 
@@ -88,12 +89,10 @@ function replot()
 	// var result = performance_data.map(x => [x.time, x.data.filter(function(x){return x.nodes==1 && x.problem=="Poisson"})[0][metric]])
 	// console.log(result)
 	
-	var trace = {x: [],
-				 y: [],
-				 name: record.time}};
-	
-	trace.x = performance_data.map(x => x.time)
-	trace.y = performance_data.map(x => x.data.filter(function(x){return x.nodes==1 && x.problem=="Poisson"})[0][metric])
+	trace_x = performance_data.map(x => x.time);
+	trace_y = performance_data.map(x => x.data.filter(function(x){return x.nodes==1 && x.problem=="Poisson"})[0][metric]);
+
+	data = [{x: trace_x, y: trace_y}];
 
 	// for (i=0; i<performance_data.length; i++)
 	// {
@@ -126,8 +125,7 @@ function replot()
 	// 		traces[k].push(trace);
 	// 	}
 	// }
-	console.log([trace])
-    Plotly.newPlot('PoissonDiv', [trace], layout_p);
+    Plotly.newPlot('PoissonDiv', data, layout_p);
     Plotly.newPlot('ElasticDiv', traces.Elastic, layout_e);
 
 }
