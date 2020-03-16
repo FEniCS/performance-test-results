@@ -24,27 +24,24 @@ var performance_data = [];
 
 function fetch_data(filename)
 {
-    console.log(filename);
     fetch('https://raw.githubusercontent.com/FEniCS/performance-test-results/master/results/' + filename)
 	.then((response) => {
 	    return response.json();
 	})
 	.then((data) => {
-	    console.log(data);
 		temp_data = [];
 	    temp_data.push(data);
 		var all_data = [];
 
 		// Temp data is separated into several individual arrays, so combine this all
 		// together.
-		for (var i in temp_data)
+		for (i=0; i<temp_data.length;i++)
 		{
-			for (var j in temp_data[i])
+			for (j=0; j<temp_data[i].length;j++)
 			{
 				performance_data.push(temp_data[i][j])
 			}
 		}
-		console.log(performance_data);
 	});
 }
 
@@ -57,16 +54,15 @@ function page_boot()
 	})
 	.then((jsonDirectory) => {
 	    saved_dir = jsonDirectory;
-	    console.log(saved_dir);
 	    for (var key in saved_dir){
 		fetch_data(saved_dir[key]['name']);
 	    }
-	    replot();
 	});
 }
 
 function replot()
 {
+	console.log(performance_data);
     var metric_selector = document.getElementById("metric");
     var metric = metric_selector.value
 
@@ -86,9 +82,9 @@ function replot()
     var traces = {Poisson:[],
 		  Elastic:[]};
 
-	for (var key in performance_data)
+	for (i=0; i<performance_data.length; i++)
 	{
-		var record = performance_data[key];
+		var record = performance_data[i];
 		console.log(record.time);
 		console.log(record.data);
 
@@ -98,14 +94,11 @@ function replot()
 			w = record.data[r];
 			p[w.problem].push([w.nodes, w[metric]]);
 		}
-		console.log(p)
 		for (var k in p)
 		{
-			console.log(p[k])
 			p[k] = p[k].sort(function(a, b){
 				return a[0] - b[0];
 			});
-			console.log(p[k])
 
 			var trace = {x: [],
 					y: [],
@@ -114,7 +107,6 @@ function replot()
 
 			for (var a in p[k])
 			{
-				console.log(p[k][a][0]);
 				trace.x.push(String(p[k][a][0])+"x");
 				trace.y.push(p[k][a][1]);
 			}
