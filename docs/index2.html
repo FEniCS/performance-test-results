@@ -42,7 +42,7 @@ function fetch_data(filename)
 				performance_data.push(temp_data[i][j])
 			}
 		}
-		performance_data = performance_data.sort((a, b) => b.time - a.time)
+		performance_data = performance_data.sort((a, b) => new Date(b.time) - new Date(a.time))
 	});
 }
 
@@ -126,7 +126,7 @@ function replot()
 	// 	}
 	// }
     Plotly.newPlot('PoissonDiv', data, layout_p);
-    Plotly.newPlot('ElasticDiv', traces.Elastic, layout_e);
+    // Plotly.newPlot('ElasticDiv', traces.Elastic, layout_e);
 
 }
 
