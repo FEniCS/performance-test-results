@@ -1,6 +1,3 @@
-<!-- Add paper print facility -->
-<!-- TODO Simplify for loops -->
-
 <head>
 	<!-- Load plotly.js into the DOM -->
 	<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
@@ -32,12 +29,10 @@
 					temp_data = [];
 					temp_data.push(data);
 
-					// Temp data is separated into several individual arrays, so combine this all
+					// temp_data is separated into several individual arrays, so combine this all
 					// together.
-					for (i = 0; i < temp_data.length; i++) {
-						for (j = 0; j < temp_data[i].length; j++) {
-							performance_data.push(temp_data[i][j])
-						}
+					for (data of temp_data[0]) {
+						performance_data.push(data)
 					}
 					performance_data = performance_data.sort((a, b) => new Date(b.time) - new Date(a.time))
 				});
@@ -58,15 +53,14 @@
 		}
 
 		function get_trace(num_nodes, problem, metric) {
-			var data_x = performance_data.map(x => x.time);
-			// TODO simplify filter with anonymous func
-			temp_y = performance_data.map(x => x.data.filter(function (x) { return x.nodes == num_nodes && x.problem == problem }));
+			var temp_x = performance_data.map(x => x.time);
+			var temp_y = performance_data.map(x => x.data.filter(x => (x.nodes == num_nodes && x.problem == problem)));
 			var trace_x = [];
 			var trace_y = [];
 
-			for (i = 0; i < data_x.length; i++) {
+			for (i = 0; i < temp_x.length; i++) {
 				if (temp_y[i].length == 1) {
-					trace_x.push(data_x[i])
+					trace_x.push(temp_x[i])
 					trace_y.push(temp_y[i][0][metric])
 				}
 			}
@@ -88,7 +82,6 @@
 		}
 
 		function replot() {
-			console.log(performance_data);
 			var metric_selector = document.getElementById("metric");
 			var metric = metric_selector.value
 
@@ -118,7 +111,7 @@
 		}
 
 		var metric_selector = document.getElementById("metric");
-		window.onload = page_boot; // Any reason for not just calling page_boot?
+		window.onload = page_boot;
 		metric_selector.onchange = replot;
 
 	</script>
