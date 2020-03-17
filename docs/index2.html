@@ -1,4 +1,5 @@
 <!-- Add paper print facility -->
+<!-- TODO Simplify for loops -->
 
 <head>
 <!-- Load plotly.js into the DOM -->
@@ -78,7 +79,7 @@ function get_trace(num_nodes, problem, metric)
 		}
 	}
 
-	return {x: trace_x, y: trace_y};
+	return {x: trace_x, y: trace_y, name: num_nodes};
 }
 
 function replot()
@@ -88,62 +89,31 @@ function replot()
     var metric = metric_selector.value
 
     var layout_e = {
-	barmode: 'group',
-	title: {text: 'Run time: '+metric+' (Elastic)'},
-	xaxis: {title: {text: 'Nodes'}},
-	yaxis: {title: {text: 'time (s)'}}
+	title: {text: 'Run time: ' + metric + ' (Elastic)'},
+	xaxis: {title: {text: 'Date'}},
+	yaxis: {title: {text: 'Time (s)'}}
     };
     var layout_p = {
-	barmode: 'group',
-	title: {text: 'Run time: '+metric+' (Poisson)'},
-	xaxis: {title: {text: 'Nodes'}},
-	yaxis: {title: {text: 'time (s)'}}
+	title: {text: 'Run time: ' + metric + ' (Poisson)'},
+	xaxis: {title: {text: 'Date'}},
+	yaxis: {title: {text: 'Time (s)'}}
     };
-
-    // var traces = {Poisson:[],
-	// 	  Elastic:[]};
-
-	// var result = Object.values(record.data).filter(function(x){return x.nodes==1})
-	// console.log(result)
-
-	// var result = performance_data.map(x => [x.time, x.data.filter(function(x){return x.nodes==1 && x.problem=="Poisson"})[0][metric]])
-	// console.log(result)
 	
-	traces = [get_trace(16, "Poisson", metric)];
+	// TODO Get these from data
+	ns = [1, 2, 4, 8, 16];
+	p_traces = [];
+	for (n of ns)
+	{
+		p_traces.push(get_trace(n, "Poisson", metric))
+	}
+	e_traces = [];
+	for (n of ns)
+	{
+		e_traces.push(get_trace(n, "Elastic", metric))
+	}
 
-	// for (i=0; i<performance_data.length; i++)
-	// {
-	// 	var record = performance_data[i];
-	// 	console.log(record.time);
-	// 	console.log(record.data);
-
-	// 	var p = {'Poisson': [], 'Elastic': []};
-	// 	for (var r in record.data)
-	// 	{
-	// 		w = record.data[r];
-	// 		p[w.problem].push([w.nodes, w[metric]]);
-	// 	}
-	// 	for (var k in p)
-	// 	{
-	// 		p[k] = p[k].sort(function(a, b){
-	// 			return a[0] - b[0];
-	// 		});
-
-	// 		var trace = {x: [],
-	// 				y: [],
-	// 				type: 'bar',
-	// 				name: record.time};
-
-	// 		for (var a in p[k])
-	// 		{
-	// 			trace.x.push(String(p[k][a][0])+"x");
-	// 			trace.y.push(p[k][a][1]);
-	// 		}
-	// 		traces[k].push(trace);
-	// 	}
-	// }
-    Plotly.newPlot('PoissonDiv', traces, layout_p);
-    // Plotly.newPlot('ElasticDiv', traces.Elastic, layout_e);
+    Plotly.newPlot('PoissonDiv', p_traces, layout_p);
+    Plotly.newPlot('ElasticDiv', e_traces, layout_e);
 
 }
 
