@@ -2,139 +2,125 @@
 <!-- TODO Simplify for loops -->
 
 <head>
-<!-- Load plotly.js into the DOM -->
-<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+	<!-- Load plotly.js into the DOM -->
+	<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
 </head>
 
 <body>
 
-  <H1> Performance Test </H1>
-  <select name="metric" id="metric">
-    <option value="Solve">Solve</option>
-    <option value="Assemble matrix">Assemble matrix</option>
-    <option value="Assemble vector">Assemble vector</option>
-    <option value="Create Mesh">Create mesh</option>
-  </select>
-  <div id='PoissonDiv'></div>
-  <div id='ElasticDiv'></div>
+	<H1> Performance Test </H1>
+	<select name="metric" id="metric">
+		<option value="Solve">Solve</option>
+		<option value="Assemble matrix">Assemble matrix</option>
+		<option value="Assemble vector">Assemble vector</option>
+		<option value="Create Mesh">Create mesh</option>
+	</select>
+	<div id='PoissonDiv'></div>
+	<div id='ElasticDiv'></div>
 
-<script>
+	<script>
 
-var saved_dir;
-var performance_data = [];
+		var saved_dir;
+		var performance_data = [];
 
-function fetch_data(filename)
-{
-    fetch('https://raw.githubusercontent.com/FEniCS/performance-test-results/master/results/' + filename)
-	.then((response) => {
-	    return response.json();
-	})
-	.then((data) => {
-		temp_data = [];
-	    temp_data.push(data);
-		var all_data = [];
+		function fetch_data(filename) {
+			fetch('https://raw.githubusercontent.com/FEniCS/performance-test-results/master/results/' + filename)
+				.then((response) => {
+					return response.json();
+				})
+				.then((data) => {
+					temp_data = [];
+					temp_data.push(data);
+					var all_data = [];
 
-		// Temp data is separated into several individual arrays, so combine this all
-		// together.
-		for (i=0; i<temp_data.length;i++)
-		{
-			for (j=0; j<temp_data[i].length;j++)
-			{
-				performance_data.push(temp_data[i][j])
+					// Temp data is separated into several individual arrays, so combine this all
+					// together.
+					for (i = 0; i < temp_data.length; i++) {
+						for (j = 0; j < temp_data[i].length; j++) {
+							performance_data.push(temp_data[i][j])
+						}
+					}
+					performance_data = performance_data.sort((a, b) => new Date(b.time) - new Date(a.time))
+				});
+		}
+
+		function page_boot() {
+			// Get directory listing and fetch data
+			fetch('https://api.github.com/repos/FEniCS/performance-test-results/contents/results')
+				.then((response) => {
+					return response.json();
+				})
+				.then((jsonDirectory) => {
+					saved_dir = jsonDirectory;
+					for (var key in saved_dir) {
+						fetch_data(saved_dir[key]['name']);
+					}
+				});
+		}
+
+		function get_trace(num_nodes, problem, metric) {
+			var data_x = performance_data.map(x => x.time);
+			// TODO simplify filter with anonymous func
+			temp_y = performance_data.map(x => x.data.filter(function (x) { return x.nodes == num_nodes && x.problem == problem }));
+			var trace_x = [];
+			var trace_y = [];
+
+			for (i = 0; i < data_x.length; i++) {
+				if (temp_y[i].length == 1) {
+					trace_x.push(data_x[i])
+					trace_y.push(temp_y[i][0][metric])
+				}
 			}
+
+			return { x: trace_x, y: trace_y, name: num_nodes + " node(s)" };
 		}
-		performance_data = performance_data.sort((a, b) => new Date(b.time) - new Date(a.time))
-	});
-}
 
-function page_boot()
-{
-    // Get directory listing and fetch data
-    fetch('https://api.github.com/repos/FEniCS/performance-test-results/contents/results')
-	.then((response) => {
-	    return response.json();
-	})
-	.then((jsonDirectory) => {
-	    saved_dir = jsonDirectory;
-	    for (var key in saved_dir){
-		fetch_data(saved_dir[key]['name']);
-	    }
-	});
-}
-
-function get_trace(num_nodes, problem, metric)
-{
-	var data_x = performance_data.map(x => x.time);
-	// TODO simplify filter with anonymous func
-	temp_y = performance_data.map(x => x.data.filter(function(x){return x.nodes==num_nodes && x.problem==problem}));
-	var trace_x = [];
-	var trace_y = [];
-
-	for (i=0; i<data_x.length; i++)
-	{
-		if (temp_y[i].length == 1)
-		{
-			trace_x.push(data_x[i])
-			trace_y.push(temp_y[i][0][metric])
-		}
-	}
-
-	return {x: trace_x, y: trace_y, name: num_nodes + " node(s)"};
-}
-
-function get_unique_num_nodes()
-{
-	unique_num_nodes = [];
-	for (performance_data_entry of performance_data)
-	{
-		for (data_entry of performance_data_entry.data)
-		{
-			if (!(unique_num_nodes.includes(data_entry.nodes)))
-			{
-				unique_num_nodes.push(data_entry.nodes)
+		function get_unique_num_nodes() {
+			unique_num_nodes = [];
+			for (performance_data_entry of performance_data) {
+				for (data_entry of performance_data_entry.data) {
+					if (!(unique_num_nodes.includes(data_entry.nodes))) {
+						unique_num_nodes.push(data_entry.nodes)
+					}
+				}
 			}
+			unique_num_nodes.sort((a, b) => a - b)
+			return unique_num_nodes
 		}
-	}
-	unique_num_nodes.sort((a, b) => a - b)
-	return unique_num_nodes
-}
 
-function replot()
-{
-	console.log(performance_data);
-    var metric_selector = document.getElementById("metric");
-    var metric = metric_selector.value
+		function replot() {
+			console.log(performance_data);
+			var metric_selector = document.getElementById("metric");
+			var metric = metric_selector.value
 
-    var layout_e = {
-	title: {text: 'Run time: ' + metric + ' (Elastic)'},
-	xaxis: {title: {text: 'Date'}},
-	yaxis: {title: {text: 'Time (s)'}}
-    };
-    var layout_p = {
-	title: {text: 'Run time: ' + metric + ' (Poisson)'},
-	xaxis: {title: {text: 'Date'}},
-	yaxis: {title: {text: 'Time (s)'}}
-    };
-	
-	ns = get_unique_num_nodes();
-	p_traces = [];
-	for (n of ns)
-	{
-		p_traces.push(get_trace(n, "Poisson", metric))
-	}
-	e_traces = [];
-	for (n of ns)
-	{
-		e_traces.push(get_trace(n, "Elastic", metric))
-	}
+			var layout_e = {
+				title: { text: 'Run time: ' + metric + ' (Elastic)' },
+				xaxis: { title: { text: 'Date' } },
+				yaxis: { title: { text: 'Time (s)' } }
+			};
+			var layout_p = {
+				title: { text: 'Run time: ' + metric + ' (Poisson)' },
+				xaxis: { title: { text: 'Date' } },
+				yaxis: { title: { text: 'Time (s)' } }
+			};
 
-    Plotly.newPlot('PoissonDiv', p_traces, layout_p);
-    Plotly.newPlot('ElasticDiv', e_traces, layout_e);
-}
+			ns = get_unique_num_nodes();
+			p_traces = [];
+			for (n of ns) {
+				p_traces.push(get_trace(n, "Poisson", metric))
+			}
+			e_traces = [];
+			for (n of ns) {
+				e_traces.push(get_trace(n, "Elastic", metric))
+			}
 
-var metric_selector = document.getElementById("metric");
-window.onload = page_boot; // Any reason for not just calling page_boot?
-metric_selector.onchange = replot;
+			Plotly.newPlot('PoissonDiv', p_traces, layout_p);
+			Plotly.newPlot('ElasticDiv', e_traces, layout_e);
+		}
 
-</script>
+		var metric_selector = document.getElementById("metric");
+		window.onload = page_boot; // Any reason for not just calling page_boot?
+		metric_selector.onchange = replot;
+
+	</script>
 </body>
