@@ -15,6 +15,7 @@
 	<div id='ElasticDiv'></div>
 
 	<script>
+		// Global variables
 		var saved_dir;
 		var performance_data = [];
 
@@ -32,7 +33,9 @@
 					for (data of temp_data[0]) {
 						performance_data.push(data)
 					}
-					performance_data = performance_data.sort(
+
+					// Sort the data based on date.
+					performance_data.sort(
 						(a, b) => new Date(b.time) - new Date(a.time))
 				});
 		}
@@ -51,23 +54,30 @@
 				});
 		}
 
+		// Gets a trace to plot based on the number of nodes, the problem,
+		// and the metric.
 		function get_trace(num_nodes, problem, metric) {
+			// Temporary arrays
 			var temp_x = performance_data.map(x => x.time);
+			// This array contains empty sub arrays when there is not any
+			// data for a particular number of nodes.
 			var temp_y = performance_data.map(x => x.data.filter(
 				y => (y.nodes == num_nodes && y.problem == problem)));
+
+			// Remove any empty data and add
 			var trace_x = [];
 			var trace_y = [];
-
 			for (i = 0; i < temp_x.length; i++) {
 				if (temp_y[i].length == 1) {
 					trace_x.push(temp_x[i])
 					trace_y.push(temp_y[i][0][metric])
 				}
 			}
-
 			return { x: trace_x, y: trace_y, name: num_nodes + " node(s)" };
 		}
 
+		// Looks at all the data and returns an array of containing the unique
+		// numbers of nodes
 		function get_unique_num_nodes() {
 			unique_num_nodes = [];
 			for (performance_data_entry of performance_data) {
@@ -85,17 +95,19 @@
 			var metric_selector = document.getElementById("metric");
 			var metric = metric_selector.value
 
-			var layout_e = {
-				title: { text: 'Run time: ' + metric + ' (Elastic)' },
-				xaxis: { title: { text: 'Date' } },
-				yaxis: { title: { text: 'Time (s)' } }
-			};
-			var layout_p = {
+			// Poisson and elasticity layouts
+			var p_layout = {
 				title: { text: 'Run time: ' + metric + ' (Poisson)' },
 				xaxis: { title: { text: 'Date' } },
 				yaxis: { title: { text: 'Time (s)' } }
 			};
+			var e_layout = {
+				title: { text: 'Run time: ' + metric + ' (Elastic)' },
+				xaxis: { title: { text: 'Date' } },
+				yaxis: { title: { text: 'Time (s)' } }
+			};
 
+			// Poisson and elasticity traces
 			ns = get_unique_num_nodes();
 			p_traces = [];
 			for (n of ns) {
@@ -106,13 +118,13 @@
 				e_traces.push(get_trace(n, "Elastic", metric))
 			}
 
-			Plotly.newPlot('PoissonDiv', p_traces, layout_p);
-			Plotly.newPlot('ElasticDiv', e_traces, layout_e);
+			// Poisson and elasticity plots
+			Plotly.newPlot('PoissonDiv', p_traces, p_layout);
+			Plotly.newPlot('ElasticDiv', e_traces, e_layout);
 		}
 
 		var metric_selector = document.getElementById("metric");
 		metric_selector.onchange = replot;
 		window.onload = page_boot;
-
 	</script>
 </body>
