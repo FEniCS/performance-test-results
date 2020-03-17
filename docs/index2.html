@@ -61,6 +61,26 @@ function page_boot()
 	});
 }
 
+function get_trace(num_nodes, problem, metric)
+{
+	var data_x = performance_data.map(x => x.time);
+	// TODO simplify filter with anonymous func
+	temp_y = performance_data.map(x => x.data.filter(function(x){return x.nodes==num_nodes && x.problem==problem}));
+	var trace_x = [];
+	var trace_y = [];
+
+	for (i=0; i<data_x.length; i++)
+	{
+		if (temp_y[i].length == 1)
+		{
+			trace_x.push(data_x[i])
+			trace_y.push(temp_y[i][0][metric])
+		}
+	}
+
+	return {x: trace_x, y: trace_y};
+}
+
 function replot()
 {
 	console.log(performance_data);
@@ -80,8 +100,8 @@ function replot()
 	yaxis: {title: {text: 'time (s)'}}
     };
 
-    var traces = {Poisson:[],
-		  Elastic:[]};
+    // var traces = {Poisson:[],
+	// 	  Elastic:[]};
 
 	// var result = Object.values(record.data).filter(function(x){return x.nodes==1})
 	// console.log(result)
@@ -89,10 +109,7 @@ function replot()
 	// var result = performance_data.map(x => [x.time, x.data.filter(function(x){return x.nodes==1 && x.problem=="Poisson"})[0][metric]])
 	// console.log(result)
 	
-	trace_x = performance_data.map(x => x.time);
-	trace_y = performance_data.map(x => x.data.filter(function(x){return x.nodes==1 && x.problem=="Poisson"})[0][metric]);
-
-	data = [{x: trace_x, y: trace_y}];
+	traces = [get_trace(16, "Poisson", metric)];
 
 	// for (i=0; i<performance_data.length; i++)
 	// {
@@ -125,7 +142,7 @@ function replot()
 	// 		traces[k].push(trace);
 	// 	}
 	// }
-    Plotly.newPlot('PoissonDiv', data, layout_p);
+    Plotly.newPlot('PoissonDiv', traces, layout_p);
     // Plotly.newPlot('ElasticDiv', traces.Elastic, layout_e);
 
 }
