@@ -4,7 +4,6 @@
 </head>
 
 <body>
-
 	<H1> Performance Test </H1>
 	<select name="metric" id="metric">
 		<option value="Solve">Solve</option>
@@ -16,7 +15,6 @@
 	<div id='ElasticDiv'></div>
 
 	<script>
-
 		var saved_dir;
 		var performance_data = [];
 
@@ -29,12 +27,13 @@
 					temp_data = [];
 					temp_data.push(data);
 
-					// temp_data is separated into several individual arrays, so combine this all
-					// together.
+					// temp_data is separated into several individual arrays,
+					// so combine this all together.
 					for (data of temp_data[0]) {
 						performance_data.push(data)
 					}
-					performance_data = performance_data.sort((a, b) => new Date(b.time) - new Date(a.time))
+					performance_data = performance_data.sort(
+						(a, b) => new Date(b.time) - new Date(a.time))
 				});
 		}
 
@@ -54,7 +53,8 @@
 
 		function get_trace(num_nodes, problem, metric) {
 			var temp_x = performance_data.map(x => x.time);
-			var temp_y = performance_data.map(x => x.data.filter(x => (x.nodes == num_nodes && x.problem == problem)));
+			var temp_y = performance_data.map(x => x.data.filter(
+				y => (y.nodes == num_nodes && y.problem == problem)));
 			var trace_x = [];
 			var trace_y = [];
 
@@ -111,8 +111,8 @@
 		}
 
 		var metric_selector = document.getElementById("metric");
-		window.onload = page_boot;
 		metric_selector.onchange = replot;
+		window.onload = page_boot;
 
 	</script>
 </body>
