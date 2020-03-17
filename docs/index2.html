@@ -79,7 +79,24 @@ function get_trace(num_nodes, problem, metric)
 		}
 	}
 
-	return {x: trace_x, y: trace_y, name: num_nodes};
+	return {x: trace_x, y: trace_y, name: num_nodes + " node(s)"};
+}
+
+function get_unique_num_nodes()
+{
+	unique_num_nodes = [];
+	for (performance_data_entry of performance_data)
+	{
+		for (data_entry of performance_data_entry.data)
+		{
+			if (!(unique_num_nodes.includes(data_entry.nodes)))
+			{
+				unique_num_nodes.push(data_entry.nodes)
+			}
+		}
+	}
+	unique_num_nodes.sort((a, b) => a - b)
+	return unique_num_nodes
 }
 
 function replot()
@@ -99,8 +116,7 @@ function replot()
 	yaxis: {title: {text: 'Time (s)'}}
     };
 	
-	// TODO Get these from data
-	ns = [1, 2, 4, 8, 16];
+	ns = get_unique_num_nodes();
 	p_traces = [];
 	for (n of ns)
 	{
@@ -114,7 +130,6 @@ function replot()
 
     Plotly.newPlot('PoissonDiv', p_traces, layout_p);
     Plotly.newPlot('ElasticDiv', e_traces, layout_e);
-
 }
 
 var metric_selector = document.getElementById("metric");
