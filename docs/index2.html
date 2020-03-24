@@ -74,7 +74,10 @@
 					trace_y.push(temp_y[i][0][metric])
 				}
 			}
-			return { x: trace_x, y: trace_y, name: num_nodes + " node(s)" };
+			return {
+				x: trace_x, y: trace_y, name: num_nodes + " node(s)",
+				mode: "lines+markers"
+			};
 		}
 
 		// Looks at all the data and returns an array of containing the unique
@@ -100,12 +103,12 @@
 			var p_layout = {
 				title: { text: 'Run time: ' + metric + ' (Poisson)' },
 				xaxis: { title: { text: 'Date' } },
-				yaxis: { title: { text: 'Time (s)' } }
+				yaxis: { title: { text: 'Time (s)' }, rangemode: "tozero" }
 			};
 			var e_layout = {
 				title: { text: 'Run time: ' + metric + ' (Elastic)' },
 				xaxis: { title: { text: 'Date' } },
-				yaxis: { title: { text: 'Time (s)' } }
+				yaxis: { title: { text: 'Time (s)' }, rangemode: "tozero" }
 			};
 
 			// Poisson and elasticity traces
