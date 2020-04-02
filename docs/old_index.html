@@ -1,0 +1,117 @@
+<head>
+<!-- Load plotly.js into the DOM -->
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+</head>
+
+<body>
+
+  <H1> Performance Test </H1>
+  <select name="metric" id="metric">
+    <option value="Solve">Solve</option>
+    <option value="Assemble matrix">Assemble matrix</option>
+    <option value="Assemble vector">Assemble vector</option>
+    <option value="Create Mesh">Create mesh</option>
+  </select>
+  <div id='PoissonDiv'></div>
+  <div id='ElasticDiv'></div>
+  <A HREF="index.html"> New page </A>
+
+<script>
+
+var saved_dir;
+var performance_data = [];
+
+function fetch_data(filename)
+{
+    console.log(filename);
+    fetch('https://raw.githubusercontent.com/FEniCS/performance-test-results/master/results/' + filename)
+	.then((response) => {
+	    return response.json();
+	})
+	.then((data) => {
+	    console.log(data);
+	    performance_data.push(data);
+	});
+}
+
+function page_boot()
+{
+    // Get directory listing and fetch data
+    fetch('https://api.github.com/repos/FEniCS/performance-test-results/contents/results')
+	.then((response) => {
+	    return response.json();
+	})
+	.then((jsonDirectory) => {
+	    saved_dir = jsonDirectory;
+	    console.log(saved_dir);
+	    for (var key in saved_dir){
+		fetch_data(saved_dir[key]['name']);
+	    }
+	    replot();
+	});
+}
+
+function replot()
+{
+    var metric_selector = document.getElementById("metric");
+    var metric = metric_selector.value
+
+    var layout_e = {
+	barmode: 'group',
+	title: {text: 'Run time: '+metric+' (Elastic)'},
+	xaxis: {title: {text: 'Nodes'}},
+	yaxis: {title: {text: 'time (s)'}}
+    };
+    var layout_p = {
+	barmode: 'group',
+	title: {text: 'Run time: '+metric+' (Poisson)'},
+	xaxis: {title: {text: 'Nodes'}},
+	yaxis: {title: {text: 'time (s)'}}
+    };
+
+    var traces = {Poisson:[],
+		  Elastic:[]};
+
+    for (var i in performance_data){
+	perf_data = performance_data[i];
+	for (var key in perf_data){
+	    var record = perf_data[key];
+	    console.log('hello')
+	    console.log(record.data);
+	    console.log(record.time);
+
+	    var p = {'Poisson': [], 'Elastic': []};
+	    for (var r in record.data){
+		w = record.data[r];
+		p[w.problem].push([w.nodes, w[metric]]);
+	    }
+	    for (var k in p){
+
+		p[k] = p[k].sort(function(a, b){
+		    return a[0] - b[0];
+		});
+
+		var trace = {x: [],
+			     y: [],
+			     type: 'bar',
+			     name: record.time};
+
+		for (var a in p[k]){
+		    trace.x.push(String(p[k][a][0])+"x");
+		    trace.y.push(p[k][a][1]);
+		}
+		traces[k].push(trace);
+	    }
+	}
+    }
+    Plotly.newPlot('PoissonDiv', traces.Poisson, layout_p);
+    Plotly.newPlot('ElasticDiv', traces.Elastic, layout_e);
+
+}
+
+var metric_selector = document.getElementById("metric");
+window.onload = page_boot;
+metric_selector.onchange = replot;
+
+</script>
+</body>
