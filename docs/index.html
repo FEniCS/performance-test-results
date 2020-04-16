@@ -71,7 +71,7 @@
 			var trace_y = [];
 			for (i = 0; i < temp_x.length; i++) {
 				if (temp_y[i].length == 1) {
-					trace_x.push(temp_x[i])
+					trace_x.push(new Date(temp_x[i]))
 					trace_y.push(temp_y[i][0][metric])
 				}
 			}
