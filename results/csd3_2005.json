@@ -1,0 +1,1 @@
+[{"time": "2020-05-27 13:51:41.043493", "machine": "csd3", "data": [{"Assemble matrix": 2.325469, "Assemble vector": 0.310418, "Create Mesh": 13.303276, "FunctionSpace": 2.7805, "Solve": 23.299509, "problem": "Poisson", "nodes": 1}]}]
