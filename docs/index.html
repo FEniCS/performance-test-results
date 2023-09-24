@@ -23,7 +23,7 @@
 		var performance_data = [];
 
 		function fetch_data(filename) {
-			fetch('https://raw.githubusercontent.com/FEniCS/performance-test-results/master/results/' + filename)
+			fetch('https://raw.githubusercontent.com/FEniCS/performance-test-results/main/results/' + filename)
 				.then((response) => {
 					return response.json();
 				})
