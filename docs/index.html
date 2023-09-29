@@ -35,11 +35,13 @@
 				.then((data) => {
 					temp_data = [];
 					temp_data.push(data);
+
 					// temp_data is separated into several individual arrays,
 					// so combine this all together.
 					for (data of temp_data[0]) {
 						performance_data.push(data)
 					}
+
 					// Sort the data based on date.
 					performance_data.sort(
 						(a, b) => new Date(b.time) - new Date(a.time))
