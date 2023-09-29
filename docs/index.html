@@ -13,6 +13,11 @@
 		<option value="Create boundary conditions">Create boundary conditions</option>
 		<option value="Create RHS function">Create RHS function</option>
 	</select>
+	<select name="partition" id="partition">
+		<option value="All">All</option>
+		<option value="Skylake">Skylake</option>
+		<option value="Icelake">Icelake</option>
+	</select>
 	<div id='PoissonDiv'></div>
 	<div id='ElasticDiv'></div>
 	<A HREF="old_index.html"> Old page </A>
@@ -30,14 +35,12 @@
 				.then((data) => {
 					temp_data = [];
 					temp_data.push(data);
-
 					// temp_data is separated into several individual arrays,
 					// so combine this all together.
 					for (data of temp_data[0]) {
 						performance_data.push(data)
 					}
-
-					// Sort the data based on date.
+                    // Sort the data based on date.
 					performance_data.sort(
 						(a, b) => new Date(b.time) - new Date(a.time))
 					replot()
@@ -60,13 +63,24 @@
 
 		// Gets a trace to plot based on the number of nodes, the problem,
 		// and the metric.
-		function get_trace(num_nodes, problem, metric) {
+		function get_trace(num_nodes, problem, metric, partition) {
 			// Temporary arrays
 			var temp_x = performance_data.map(x => x.time);
 			// This array contains empty sub arrays when there is not any
 			// data for a particular number of nodes.
-			var temp_y = performance_data.map(x => x.data.filter(
-				y => (y.nodes == num_nodes && y.problem == problem)));
+            console.log(temp_x) 
+            if (partition == "Icelake"){
+                temp_y = performance_data.map(x => x.data.filter(
+                    y => (y.nodes == num_nodes && y.problem == problem && x.partition == 'icelake')));
+            }
+            else if(partition == "Skylake"){
+                temp_y = performance_data.map(x => x.data.filter(
+                    y => (y.nodes == num_nodes && y.problem == problem && !x.partition)));
+            }
+            else{
+                temp_y = performance_data.map(x => x.data.filter(
+                    y => (y.nodes == num_nodes && y.problem == problem)));
+            }
 
 			// Remove any empty data and add
 			var trace_x = [];
@@ -83,7 +97,7 @@
 			};
 		}
 
-		// Looks at all the data and returns an array of containing the unique
+		// Looks at all the data and returns an array containing the unique
 		// numbers of nodes
 		function get_unique_num_nodes() {
 			unique_num_nodes = [];
@@ -101,6 +115,8 @@
 		function replot() {
 			var metric_selector = document.getElementById("metric");
 			var metric = metric_selector.value
+			var partition_selector = document.getElementById("partition");
+			var partition = partition_selector.value
 
 			// Poisson and elasticity layouts
 			var p_layout = {
@@ -118,11 +134,11 @@
 			ns = get_unique_num_nodes();
 			p_traces = [];
 			for (n of ns) {
-				p_traces.push(get_trace(n, "Poisson", metric))
+				p_traces.push(get_trace(n, "Poisson", metric, partition))
 			}
 			e_traces = [];
 			for (n of ns) {
-				e_traces.push(get_trace(n, "Elastic", metric))
+				e_traces.push(get_trace(n, "Elastic", metric, partition))
 			}
 
 			// Poisson and elasticity plots
@@ -132,6 +148,8 @@
 
 		var metric_selector = document.getElementById("metric");
 		metric_selector.onchange = replot;
+		var partition_selector = document.getElementById("partition");
+		partition_selector.onchange = replot;
 		window.onload = page_boot;
 	</script>
 </body>
