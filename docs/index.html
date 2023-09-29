@@ -40,7 +40,7 @@
 					for (data of temp_data[0]) {
 						performance_data.push(data)
 					}
-                    // Sort the data based on date.
+					// Sort the data based on date.
 					performance_data.sort(
 						(a, b) => new Date(b.time) - new Date(a.time))
 					replot()
@@ -68,21 +68,20 @@
 			var temp_x = performance_data.map(x => x.time);
 			// This array contains empty sub arrays when there is not any
 			// data for a particular number of nodes.
-            console.log(temp_x) 
-            if (partition == "Icelake"){
-                temp_y = performance_data.map(x => x.data.filter(
-                    y => (y.nodes == num_nodes && y.problem == problem && x.partition == 'icelake')));
-            }
-            // Skylake data preceded addition of partition key in performance_data. 
-            // TODO: Retroactively add
-            else if(partition == "Skylake"){
-                temp_y = performance_data.map(x => x.data.filter(
-                    y => (y.nodes == num_nodes && y.problem == problem && !x.partition)));
-            }
-            else{
-                temp_y = performance_data.map(x => x.data.filter(
-                    y => (y.nodes == num_nodes && y.problem == problem)));
-            }
+			if (partition == "Icelake"){
+				temp_y = performance_data.map(x => x.data.filter(
+					y => (y.nodes == num_nodes && y.problem == problem && x.partition == 'icelake')));
+			}
+			// Skylake data preceded addition of partition key in performance_data. 
+			// TODO: Retroactively add
+			else if(partition == "Skylake"){
+				temp_y = performance_data.map(x => x.data.filter(
+					y => (y.nodes == num_nodes && y.problem == problem && !x.partition)));
+			}
+			else{
+				temp_y = performance_data.map(x => x.data.filter(
+					y => (y.nodes == num_nodes && y.problem == problem)));
+			}
 
 			// Remove any empty data and add
 			var trace_x = [];
