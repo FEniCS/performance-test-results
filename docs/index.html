@@ -73,6 +73,8 @@
                 temp_y = performance_data.map(x => x.data.filter(
                     y => (y.nodes == num_nodes && y.problem == problem && x.partition == 'icelake')));
             }
+            // Skylake data preceded addition of partition key in performance_data. 
+            // TODO: Retroactively add
             else if(partition == "Skylake"){
                 temp_y = performance_data.map(x => x.data.filter(
                     y => (y.nodes == num_nodes && y.problem == problem && !x.partition)));
