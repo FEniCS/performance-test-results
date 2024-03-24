@@ -49,6 +49,21 @@
 				});
 		}
 
+        function get_last_year(key){
+            data_year = parseInt(20 + saved_dir[key]['name'].split(".")[0].split("_")[1].slice(0,2))
+            data_month = parseInt(saved_dir[key]['name'].split(".")[0].split("_")[1].slice(2,4))
+            var d = new Date()
+            var month = d.getMonth()
+            var year = d.getFullYear()
+            var data_d = new Date(data_year, data_month)
+            var old_d = new Date(year - 1, month)
+
+            if (data_d > old_d){
+                return 1
+            }
+            return 0
+        }
+
 		function page_boot() {
 			// Get directory listing and fetch data
 			fetch('https://api.github.com/repos/FEniCS/performance-test-results/contents/results')
@@ -58,7 +73,10 @@
 				.then((jsonDirectory) => {
 					saved_dir = jsonDirectory;
 					for (var key in saved_dir) {
-						fetch_data(saved_dir[key]['name']);
+
+                        if (get_last_year(key)){
+						  fetch_data(saved_dir[key]['name'])
+                        }
 					}
 				});
 		}
